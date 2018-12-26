@@ -1,0 +1,8 @@
+[package]
+name = "mini-grep"
+version = "0.1.0"
+authors = ["rust"]
+edition = "2018"
+
+[dev-dependencies]
+cargo-watch = "7.0.7"
