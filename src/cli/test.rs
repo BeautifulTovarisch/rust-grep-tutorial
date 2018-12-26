@@ -1,9 +1,7 @@
-use std::io;
 use std::fs::{
     write,
     remove_file
 };
-use std::error::Error;
 
 use super::{
     Param,
@@ -11,32 +9,31 @@ use super::{
     search,
     get_args,
     read_file,
-
 };
 
 #[test]
 fn test_run() {
     let filename = "test_run.test";
 
-    write( filename, b"Some Content" );
+    write( filename, b"Some Content" ).unwrap();
 
     let query = String::from( "some regex" );
     let file = String::from( filename );
 
     assert!( run( query, file ).is_ok() );
 
-    remove_file( filename );
+    remove_file( filename ).unwrap();
 }
 
 #[test]
 fn test_search() {
     let query = "duct";
     let contents = "\
-    Rust:
-    safe, fast, productive.
-    Pick three.";
+Rust:
+safe, fast, productive.
+Pick three.";
 
-    assert_eq!( search( query, contents ), vec![ "safe, fast, productive" ] );
+    assert_eq!( search( query, contents ), vec![ "safe, fast, productive." ] );
 }
 
 #[test]
@@ -65,7 +62,7 @@ fn test_get_args_err() {
 fn test_read_file_ok() {
     let filename = "test_file.test";
 
-    write( filename, b"Test Content!" );
+    write( filename, b"Test Content!" ).unwrap();
 
     if let Ok( contents ) = read_file( &String::from( "test_file.test" ) ) {
         assert_eq!( contents, "Test Content!" );
@@ -73,7 +70,7 @@ fn test_read_file_ok() {
         panic!( "Test Failed" );
     }
 
-    remove_file( filename );
+    remove_file( filename ).unwrap();
 }
 
 #[test]
