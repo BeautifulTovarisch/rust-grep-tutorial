@@ -1,58 +1,36 @@
 use std::fs;
-use std::io;
+use std::io::{ Error as IOError };
+use std::path::{ PathBuf };
 use std::error::Error;
 
-pub struct Param {
-    pub query: String,
-    pub filename: String
-}
-
-/// Search a collection of strings given a query
+/// Search a collection of strings given a pattern
 ///
 /// # Examples
 ///
-/// let query = "Test"
+/// let pattern = "Test"
 ///
 /// let contents = "\
 /// This Line Doesn't Return
 /// Test. This one should.
 ///
-/// assert_eq!( search( query, contents ), vec![ "Test.",
+/// assert_eq!( search( pattern, contents ), vec![ "Test.",
 ///                                              "This",
 ///                                              "one",
 ///                                              "should." ] );
 
-pub fn search<'a>( query: &str, contents: &'a str ) -> Vec<&'a str> {
+fn search<'a>( pattern: &str, contents: &'a str ) -> Vec<&'a str> {
     contents.lines()
-        .filter( |line| line.contains( query ) )
+        .filter( |line| line.contains( pattern ) )
         .collect()
 }
 
-pub fn get_args( mut args: std::env::Args ) -> Result<Param, &'static str> {
-    if args.len() < 3 {
-        return Err( "Invalid number of arguments!" );
-    }
-
-    let query = match args.nth( 1 ) {
-        Some( arg ) => arg,
-        None => return Err( "Query not provided." )
-    };
-
-    let filename = match args.nth( 2 ) {
-        Some( arg ) => arg,
-        None => return Err( "Filename, not provided." )
-    };
-
-    Ok( Param { query, filename } )
+fn read_file( path: &PathBuf ) -> Result<String, IOError> {
+    fs::read_to_string( path )
 }
 
-pub fn read_file( filename: &String ) -> Result<String, io::Error> {
-    fs::read_to_string( filename )
-}
-
-pub fn run( query: String, filename: String ) -> Result<(), Box<dyn Error>> {
-    let contents = read_file( &filename )?;
-    for line in search( &query, &contents ) {
+pub fn run( pattern: String, path: PathBuf ) -> Result<(), Box<dyn Error>> {
+    let contents = read_file( &path )?;
+    for line in search( &pattern, &contents ) {
         println!( "{}", line );
     }
 

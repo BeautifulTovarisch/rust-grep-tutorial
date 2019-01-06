@@ -1,17 +1,22 @@
-use std::env;
 use std::process;
 
-mod cli;
+use structopt::StructOpt;
 
-use crate::cli::{ run, get_args, Param };
+mod cli;
+use crate::cli::{ run };
+
+#[derive(StructOpt)]
+struct Cli {
+    pattern: String,
+
+    #[structopt(parse(from_os_str))]
+    path: std::path::PathBuf
+}
 
 fn main() {
-    let Param { query, filename } = get_args( env::args() ).unwrap_or_else( |err| {
-        eprintln!( "Error parsing arguments: {}", err );
-        process::exit( 1 )
-    });
+    let Cli { pattern, path } = Cli::from_args();
 
-    if let Err( e ) = run( query, filename ) {
+    if let Err( e ) = run( pattern, path ) {
         eprintln!( "Error {}", e );
         process::exit( 1 );
     }
